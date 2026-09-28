@@ -1,8 +1,0 @@
-node_modules/
-db/inventory.db
-db/inventory.db-journal
-db/inventory.db-wal
-db/inventory.db-shm
-db/session-secret.txt
-db/sessions/
-*.log
