@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IUK Inventory Management System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-crest">IUK</span>
+    <span class="brand-text">
+      <span class="brand-title">Islamic University of Kenya</span>
+      <span class="brand-subtitle">Inventory Management System</span>
+    </span>
+  </div>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="items">Items</button>
+    <button class="tab-btn" data-tab="scan">Scan</button>
+    <button class="tab-btn" data-tab="print">Print Labels</button>
+    <button class="tab-btn" data-tab="reports">Reports</button>
+  </nav>
+  <div class="account-menu">
+    <button class="btn account-btn" id="account-btn">👤 <span id="account-username">Account</span> ▾</button>
+    <div class="account-dropdown" id="account-dropdown">
+      <button id="change-password-btn">Change Password</button>
+      <button id="logout-btn">Log Out</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard" class="tab-panel active">
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total-items">0</div>
+        <div class="stat-label">Total Items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total-units">0</div>
+        <div class="stat-label">Total Units in Stock</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total-value">$0</div>
+        <div class="stat-label">Inventory Value</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="stat-value" id="stat-low-stock">0</div>
+        <div class="stat-label">Low Stock Items</div>
+      </div>
+    </div>
+
+    <h2>Low Stock Alerts</h2>
+    <table class="data-table" id="low-stock-table">
+      <thead><tr><th>Name</th><th>Barcode</th><th>Qty</th><th>Reorder Level</th><th>Location</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- ITEMS -->
+  <section id="tab-items" class="tab-panel">
+    <div class="toolbar">
+      <input type="text" id="search-box" placeholder="Search by name, barcode, supplier, location...">
+      <select id="category-filter"><option value="">All Categories</option></select>
+      <label class="checkbox-label"><input type="checkbox" id="low-stock-filter"> Low stock only</label>
+      <button class="btn primary" id="add-item-btn">+ Add Item</button>
+    </div>
+    <table class="data-table" id="items-table">
+      <thead>
+        <tr>
+          <th>Name</th><th>Barcode</th><th>Category</th><th>Qty</th><th>Price</th>
+          <th>Supplier</th><th>Location</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- SCAN -->
+  <section id="tab-scan" class="tab-panel">
+    <div class="scan-layout">
+      <div class="scan-panel">
+        <h2>Scan with USB Scanner</h2>
+        <p class="hint">Click the box below, then scan a barcode with your USB/keyboard-wedge scanner. It will look up the item automatically.</p>
+        <input type="text" id="scanner-input" placeholder="Click here, then scan..." autocomplete="off">
+
+        <h2 style="margin-top:2rem">Scan with Camera</h2>
+        <button class="btn" id="camera-toggle-btn">Start Camera Scanner</button>
+        <div id="camera-reader" style="max-width:400px; margin-top:1rem;"></div>
+      </div>
+
+      <div class="scan-result" id="scan-result">
+        <p class="hint">Scan result will appear here.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRINT LABELS -->
+  <section id="tab-print" class="tab-panel">
+    <div class="toolbar">
+      <input type="text" id="print-search" placeholder="Search items to add to label sheet...">
+      <button class="btn primary" id="print-btn">🖨 Print Label Sheet</button>
+      <button class="btn" id="print-clear-btn">Clear Selection</button>
+    </div>
+    <div class="print-columns">
+      <div>
+        <h3>Available Items</h3>
+        <table class="data-table" id="print-select-table">
+          <thead><tr><th></th><th>Name</th><th>Barcode</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <h3>Label Sheet Preview (<span id="print-count">0</span> labels)</h3>
+        <div id="label-sheet" class="label-sheet"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORTS -->
+  <section id="tab-reports" class="tab-panel">
+    <div class="toolbar" style="justify-content:space-between">
+      <div class="hint" id="report-generated-at"></div>
+      <button class="btn primary" id="dl-inventory-csv">⬇ Download Full Inventory Report (CSV)</button>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-value" id="r-total-items">0</div>
+        <div class="stat-label">Total Items</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="r-total-units">0</div>
+        <div class="stat-label">Total Units in Stock</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="r-total-value">$0</div>
+        <div class="stat-label">Inventory Value</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="stat-value" id="r-low-stock">0</div>
+        <div class="stat-label">Low Stock Items</div>
+      </div>
+    </div>
+
+    <h2>Inventory Value by Category</h2>
+    <table class="data-table" id="category-report-table">
+      <thead><tr><th>Category</th><th>Items</th><th>Units</th><th>Value</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <h2 style="display:flex; align-items:center; justify-content:space-between">
+      Low Stock Report
+      <button class="btn small" id="dl-lowstock-csv">⬇ CSV</button>
+    </h2>
+    <table class="data-table" id="report-lowstock-table">
+      <thead><tr><th>Name</th><th>Barcode</th><th>Category</th><th>Qty</th><th>Reorder Level</th><th>Location</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <h2 style="display:flex; align-items:center; justify-content:space-between">
+      Recent Stock Movements
+      <button class="btn small" id="dl-movements-csv">⬇ CSV</button>
+    </h2>
+    <table class="data-table" id="report-movements-table">
+      <thead><tr><th>Date</th><th>Item</th><th>Barcode</th><th>Change</th><th>Reason</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+
+<!-- Add/Edit Item Modal -->
+<div id="item-modal" class="modal-backdrop">
+  <div class="modal">
+    <h2 id="modal-title">Add Item</h2>
+    <form id="item-form">
+      <input type="hidden" id="item-id">
+      <label>Name *<input type="text" id="f-name" required></label>
+      <label>Barcode <small>(leave blank to auto-generate)</small><input type="text" id="f-barcode"></label>
+      <label>Category<input type="text" id="f-category"></label>
+      <div class="form-row">
+        <label>Quantity<input type="number" id="f-quantity" value="0"></label>
+        <label>Reorder Level<input type="number" id="f-reorder" value="0"></label>
+      </div>
+      <label>Price<input type="number" step="0.01" id="f-price" value="0"></label>
+      <label>Supplier<input type="text" id="f-supplier"></label>
+      <label>Location<input type="text" id="f-location"></label>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="modal-cancel-btn">Cancel</button>
+        <button type="submit" class="btn primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Stock Adjust Modal -->
+<div id="adjust-modal" class="modal-backdrop">
+  <div class="modal">
+    <h2>Adjust Stock — <span id="adjust-item-name"></span></h2>
+    <form id="adjust-form">
+      <input type="hidden" id="adjust-item-id">
+      <label>Change (use negative to remove stock)<input type="number" id="adjust-change" required></label>
+      <label>Reason<input type="text" id="adjust-reason" placeholder="e.g. received shipment, sold, damaged"></label>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="adjust-cancel-btn">Cancel</button>
+        <button type="submit" class="btn primary">Apply</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="password-modal" class="modal-backdrop">
+  <div class="modal">
+    <h2>Change Password</h2>
+    <div class="error" id="password-error" style="display:none; background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; border-radius:8px; padding:0.6rem 0.75rem; font-size:0.85rem; margin-bottom:1rem;"></div>
+    <form id="password-form">
+      <label>Current Password<input type="password" id="pw-current" required></label>
+      <label>New Password <small>(min. 8 characters)</small><input type="password" id="pw-new" required minlength="8"></label>
+      <label>Confirm New Password<input type="password" id="pw-confirm" required minlength="8"></label>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="password-cancel-btn">Cancel</button>
+        <button type="submit" class="btn primary">Update Password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
