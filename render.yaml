@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: iuk-inventory
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: DATA_DIR
+        value: /opt/render/project/src/db
+      - key: NODE_ENV
+        value: production
