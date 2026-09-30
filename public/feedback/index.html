@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cafeteria Feedback Â· IUK</title>
+<style>
+  :root {
+    --primary: #08305B;
+    --primary-dark: #051d38;
+    --gold: #C9A24B;
+    --bg: #f4f6f9;
+    --card-bg: #ffffff;
+    --border: #e2e8f0;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --danger: #dc2626;
+    --success: #15803d;
+    --success-bg: #f0fdf4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .topbar {
+    background: var(--primary-dark);
+    color: white;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .brand-crest {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.72rem;
+    flex-shrink: 0;
+  }
+  .brand-title { font-size: 1.02rem; font-weight: 700; }
+  .brand-subtitle { font-size: 0.72rem; color: #cbd5e1; }
+
+  main {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 3rem;
+  }
+  .lang-switch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .lang-btn {
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .lang-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+  h1 { font-size: 1.35rem; margin: 0 0 0.35rem; color: var(--primary-dark); }
+  .subtitle { color: var(--muted); font-size: 0.92rem; margin: 0 0 1.5rem; }
+
+  label { display: block; font-size: 0.88rem; color: var(--muted); margin-bottom: 1.1rem; }
+  label .req { color: var(--danger); }
+  select, textarea, input[type=text] {
+    display: block;
+    width: 100%;
+    margin-top: 0.4rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text);
+    background: white;
+  }
+  textarea { min-height: 120px; resize: vertical; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    font-size: 1.02rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-submit:hover { background: var(--primary-dark); }
+  .btn-submit:disabled { opacity: 0.6; cursor: default; }
+
+  .error-msg { color: var(--danger); font-size: 0.85rem; margin: -0.6rem 0 1rem; display: none; }
+  .error-msg.show { display: block; }
+
+  .success-card { display: none; text-align: center; }
+  .success-card.show { display: block; }
+  .success-card .check {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--success-bg); color: var(--success);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; margin: 0 auto 1rem;
+  }
+  .success-card h2 { color: var(--success); margin: 0 0 0.5rem; }
+  .success-card p { color: var(--muted); margin: 0 0 1.5rem; }
+  .link-btn {
+    background: none; border: none; color: var(--primary);
+    text-decoration: underline; cursor: pointer; font-size: 0.95rem;
+  }
+
+  html[dir="rtl"] .lang-switch { direction: rtl; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand-crest">IUK</div>
+    <div>
+      <div class="brand-title" data-t="title">Cafeteria Feedback</div>
+      <div class="brand-subtitle">IUK University</div>
+    </div>
+  </div>
+
+  <main>
+    <div class="lang-switch" id="lang-switch">
+      <button class="lang-btn" data-lang="en">English</button>
+      <button class="lang-btn" data-lang="ar">Ø§ÙØ¹Ø±Ø¨ÙØ©</button>
+      <button class="lang-btn" data-lang="sw">Kiswahili</button>
+      <button class="lang-btn" data-lang="so">Soomaali</button>
+      <button class="lang-btn" data-lang="fr">FranÃ§ais</button>
+    </div>
+
+    <div class="card" id="form-card">
+      <h1 data-t="title">Cafeteria Feedback</h1>
+      <p class="subtitle" data-t="subtitle">Tell us about your experience â your feedback helps us improve.</p>
+
+      <form id="feedback-form">
+        <label>
+          <span data-t="categoryLabel">What is this about?</span>
+          <select id="category" name="category">
+            <option value="food" data-t="cat_food">Food quality</option>
+            <option value="cleanliness" data-t="cat_cleanliness">Cleanliness</option>
+            <option value="service" data-t="cat_service">Staff &amp; service</option>
+            <option value="price" data-t="cat_price">Price</option>
+            <option value="other" data-t="cat_other">Other</option>
+          </select>
+        </label>
+
+        <label>
+          <span data-t="messageLabel">Your suggestion or problem</span> <span class="req">*</span>
+          <textarea id="message" name="message" data-t-ph="messagePlaceholder" placeholder="Describe what happened or what you'd like to see improved..."></textarea>
+        </label>
+        <div class="error-msg" id="error-msg" data-t="errorEmpty">Please write your feedback before submitting.</div>
+
+        <label>
+          <span data-t="contactLabel">Your name or contact (optional)</span>
+          <input type="text" id="contact" name="contact" data-t-ph="contactPlaceholder" placeholder="Leave blank to stay anonymous">
+        </label>
+
+        <button type="submit" class="btn-submit" id="submit-btn" data-t="submit">Submit Feedback</button>
+      </form>
+    </div>
+
+    <div class="card success-card" id="success-card">
+      <div class="check">&#10003;</div>
+      <h2 data-t="successTitle">Thank you!</h2>
+      <p data-t="successBody">Your feedback has been received. We appreciate you taking the time to help us improve.</p>
+      <button class="link-btn" id="another-btn" data-t="another">Submit another response</button>
+    </div>
+  </main>
+
+<script>
+const STRINGS = {
+  en: {
+    title: "Cafeteria Feedback",
+    subtitle: "Tell us about your experience â your feedback helps us improve.",
+    categoryLabel: "What is this about?",
+    cat_food: "Food quality", cat_cleanliness: "Cleanliness", cat_service: "Staff & service", cat_price: "Price", cat_other: "Other",
+    messageLabel: "Your suggestion or problem",
+    messagePlaceholder: "Describe what happened or what you'd like to see improved...",
+    contactLabel: "Your name or contact (optional)",
+    contactPlaceholder: "Leave blank to stay anonymous",
+    submit: "Submit Feedback",
+    successTitle: "Thank you!",
+    successBody: "Your feedback has been received. We appreciate you taking the time to help us improve.",
+    another: "Submit another response",
+    errorEmpty: "Please write your feedback before submitting.",
+    dir: "ltr"
+  },
+  ar: {
+    title: "ÙÙØ§Ø­Ø¸Ø§Øª Ø§ÙÙØ§ÙØªÙØ±ÙØ§",
+    subtitle: "Ø£Ø®Ø¨Ø±ÙØ§ Ø¹Ù ØªØ¬Ø±Ø¨ØªÙ â ÙÙØ§Ø­Ø¸Ø§ØªÙ ØªØ³Ø§Ø¹Ø¯ÙØ§ Ø¹ÙÙ Ø§ÙØªØ­Ø³ÙÙ.",
+    categoryLabel: "Ø¹Ù ÙØ§Ø°Ø§ ØªØ±ÙØ¯ Ø£Ù ØªØ®Ø¨Ø±ÙØ§Ø",
+    cat_food: "Ø¬ÙØ¯Ø© Ø§ÙØ·Ø¹Ø§Ù", cat_cleanliness: "Ø§ÙÙØ¸Ø§ÙØ©", cat_service: "Ø§ÙÙÙØ¸ÙÙÙ ÙØ§ÙØ®Ø¯ÙØ©", cat_price: "Ø§ÙØ³Ø¹Ø±", cat_other: "Ø£Ø®Ø±Ù",
+    messageLabel: "Ø§ÙØªØ±Ø§Ø­Ù Ø£Ù Ø§ÙÙØ´ÙÙØ© Ø§ÙØªÙ ØªÙØ§Ø¬ÙÙØ§",
+    messagePlaceholder: "ØµÙ ÙØ§ Ø­Ø¯Ø« Ø£Ù ÙØ§ ØªØ±ØºØ¨ ÙÙ ØªØ­Ø³ÙÙÙ...",
+    contactLabel: "Ø§Ø³ÙÙ Ø£Ù ÙØ³ÙÙØ© Ø§ÙØªÙØ§ØµÙ (Ø§Ø®ØªÙØ§Ø±Ù)",
+    contactPlaceholder: "Ø§ØªØ±ÙÙ ÙØ§Ø±ØºØ§Ù ÙÙØ¨ÙØ§Ø¡ ÙØ¬ÙÙÙØ§Ù",
+    submit: "Ø¥Ø±Ø³Ø§Ù Ø§ÙÙÙØ§Ø­Ø¸Ø§Øª",
+    successTitle: "Ø´ÙØ±Ø§Ù ÙÙ!",
+    successBody: "ØªÙ Ø§Ø³ØªÙØ§Ù ÙÙØ§Ø­Ø¸Ø§ØªÙ. ÙÙØ¯Ø± ÙÙØªÙ ÙÙØ³Ø§Ø¹Ø¯ØªÙØ§ Ø¹ÙÙ Ø§ÙØªØ­Ø³ÙÙ.",
+    another: "Ø¥Ø±Ø³Ø§Ù ÙÙØ§Ø­Ø¸Ø© Ø£Ø®Ø±Ù",
+    errorEmpty: "ÙØ±Ø¬Ù ÙØªØ§Ø¨Ø© ÙÙØ§Ø­Ø¸Ø§ØªÙ ÙØ¨Ù Ø§ÙØ¥Ø±Ø³Ø§Ù.",
+    dir: "rtl"
+  },
+  sw: {
+    title: "Maoni ya Mkahawa",
+    subtitle: "Tuambie kuhusu uzoefu wako â maoni yako yanatusaidia kuboresha.",
+    categoryLabel: "Hili linahusu nini?",
+    cat_food: "Ubora wa chakula", cat_cleanliness: "Usafi", cat_service: "Wafanyakazi na huduma", cat_price: "Bei", cat_other: "Nyingine",
+    messageLabel: "Pendekezo lako au tatizo",
+    messagePlaceholder: "Eleza kilichotokea au ungependa nini kiboreshwe...",
+    contactLabel: "Jina lako au mawasiliano (si lazima)",
+    contactPlaceholder: "Acha wazi ili ubaki bila kutambulika",
+    submit: "Tuma Maoni",
+    successTitle: "Asante!",
+    successBody: "Maoni yako yamepokelewa. Tunathamini muda wako wa kutusaidia kuboresha.",
+    another: "Tuma maoni mengine",
+    errorEmpty: "Tafadhali andika maoni yako kabla ya kutuma.",
+    dir: "ltr"
+  },
+  so: {
+    title: "Ra'yiga Kafateeriyada",
+    subtitle: "Noo sheeg khibradaada â ra'yigaaga wuxuu naga caawinayaa inaan horumarno.",
+    categoryLabel: "Waa maxay wixii aad ka hadlaysid?",
+    cat_food: "Tayada cuntada", cat_cleanliness: "Nadaafadda", cat_service: "Shaqaalaha & adeegga", cat_price: "Qiimaha", cat_other: "Wax kale",
+    messageLabel: "Talo-bixintaada ama dhibaatada",
+    messagePlaceholder: "Sharax waxa dhacay ama waxa aad jeclaan lahayd in la hagaajiyo...",
+    contactLabel: "Magacaaga ama xiriirka (ikhtiyaari)",
+    contactPlaceholder: "Ka tag banaan si aad qarsoodi u ahaato",
+    submit: "Dir Ra'yiga",
+    successTitle: "Mahadsanid!",
+    successBody: "Ra'yigaaga waa la helay. Waan ku mahadsan nahay waqtigaaga si aad noo caawiso horumarineed.",
+    another: "Dir ra'yi kale",
+    errorEmpty: "Fadlan qor ra'yigaaga ka hor intaadan gudbin.",
+    dir: "ltr"
+  },
+  fr: {
+    title: "Avis sur la CafÃ©tÃ©ria",
+    subtitle: "Parlez-nous de votre expÃ©rience â vos avis nous aident Ã  nous amÃ©liorer.",
+    categoryLabel: "De quoi s'agit-il ?",
+    cat_food: "QualitÃ© de la nourriture", cat_cleanliness: "PropretÃ©", cat_service: "Personnel et service", cat_price: "Prix", cat_other: "Autre",
+    messageLabel: "Votre suggestion ou problÃ¨me",
+    messagePlaceholder: "DÃ©crivez ce qui s'est passÃ© ou ce que vous aimeriez voir amÃ©liorÃ©...",
+    contactLabel: "Votre nom ou contact (facultatif)",
+    contactPlaceholder: "Laissez vide pour rester anonyme",
+    submit: "Envoyer",
+    successTitle: "Merci !",
+    successBody: "Votre avis a bien Ã©tÃ© reÃ§u. Nous vous remercions de nous aider Ã  nous amÃ©liorer.",
+    another: "Envoyer un autre avis",
+    errorEmpty: "Veuillez Ã©crire votre avis avant d'envoyer.",
+    dir: "ltr"
+  }
+};
+
+let currentLang = localStorage.getItem('feedback_lang') || 'en';
+if (!STRINGS[currentLang]) currentLang = 'en';
+
+function applyLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('feedback_lang', lang); } catch (e) {}
+  const s = STRINGS[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = s.dir;
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (s[key] !== undefined) el.textContent = s[key];
+  });
+  document.querySelectorAll('[data-t-ph]').forEach(el => {
+    const key = el.getAttribute('data-t-ph');
+    if (s[key] !== undefined) el.setAttribute('placeholder', s[key]);
+  });
+  document.querySelectorAll('#lang-switch .lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+}
+
+document.querySelectorAll('#lang-switch .lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.getAttribute('data-lang')));
+});
+
+applyLang(currentLang);
+
+const form = document.getElementById('feedback-form');
+const errorMsg = document.getElementById('error-msg');
+const submitBtn = document.getElementById('submit-btn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const message = document.getElementById('message').value.trim();
+  if (!message) {
+    errorMsg.classList.add('show');
+    return;
+  }
+  errorMsg.classList.remove('show');
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: currentLang,
+        category: document.getElementById('category').value,
+        message: message,
+        contact: document.getElementById('contact').value.trim()
+      })
+    });
+    if (!res.ok) throw new Error('submit_failed');
+
+    document.getElementById('form-card').style.display = 'none';
+    document.getElementById('success-card').classList.add('show');
+  } catch (err) {
+    errorMsg.textContent = STRINGS[currentLang].errorEmpty;
+    errorMsg.classList.add('show');
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+document.getElementById('another-btn').addEventListener('click', () => {
+  form.reset();
+  document.getElementById('success-card').classList.remove('show');
+  document.getElementById('form-card').style.display = 'block';
+});
+</script>
+</body>
+</html>
