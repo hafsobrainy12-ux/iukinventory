@@ -7,6 +7,8 @@ const FileStore = require('session-file-store')(session);
 const itemsRouter = require('./routes/items');
 const authRouter = require('./routes/auth');
 const reportsRouter = require('./routes/reports');
+const feedbackRouter = require('./routes/feedback');
+const feedbackAdminRouter = require('./routes/feedbackAdmin');
 const requireAuth = require('./middleware/requireAuth');
 require('./db/init'); // ensures tables exist on boot
 
@@ -55,11 +57,17 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 app.use('/auth', express.static(path.join(__dirname, 'public', 'auth')));
 app.use('/api/auth', authRouter);
 
+// Cafeteria feedback form + its submission endpoint are public too, so
+// students can reach them straight from a QR code without logging in.
+app.use('/feedback', express.static(path.join(__dirname, 'public', 'feedback')));
+app.use('/api/feedback', feedbackRouter);
+
 // Everything below this line requires a logged-in session.
 app.use(requireAuth);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/items', itemsRouter);
 app.use('/api/reports', reportsRouter);
+app.use('/api/feedback/admin', feedbackAdminRouter);
 
 function getLanAddresses() {
   const nets = os.networkInterfaces();
