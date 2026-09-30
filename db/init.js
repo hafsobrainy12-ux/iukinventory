@@ -39,6 +39,16 @@ db.exec(`
     reason TEXT DEFAULT '',
     created_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS cafeteria_feedback (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    language TEXT NOT NULL DEFAULT 'en',
+    category TEXT DEFAULT '',
+    message TEXT NOT NULL,
+    contact TEXT DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'new',
+    created_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 // Seed a default admin account on first run only.
