@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cafeteria Feedback Â· Admin Â· IUK Inventory</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  .fb-toolbar select { padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; }
+  .status-pill {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .status-pill.new { background: #fff7ed; color: #c2410c; }
+  .status-pill.reviewed { background: #f0fdf4; color: #15803d; }
+  .fb-message { max-width: 340px; white-space: pre-wrap; }
+  .lang-tag {
+    display: inline-block;
+    background: #eef2ff;
+    color: #3730a3;
+    border-radius: 6px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .empty-state { padding: 2rem; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-crest">IUK</div>
+      <div class="brand-text">
+        <div class="brand-title">Cafeteria Feedback</div>
+        <div class="brand-subtitle">Student suggestions &amp; complaints</div>
+      </div>
+    </div>
+    <a href="/" class="btn" style="color:white;text-decoration:none;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.25);">&larr; Back to Inventory</a>
+  </div>
+
+  <main>
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Total submissions</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="stat-value" id="stat-new">0</div>
+        <div class="stat-label">Not yet reviewed</div>
+      </div>
+    </div>
+
+    <div class="toolbar fb-toolbar">
+      <select id="filter-status">
+        <option value="">All statuses</option>
+        <option value="new">New</option>
+        <option value="reviewed">Reviewed</option>
+      </select>
+      <select id="filter-language">
+        <option value="">All languages</option>
+        <option value="en">English</option>
+        <option value="ar">Arabic</option>
+        <option value="sw">Kiswahili</option>
+        <option value="so">Somali</option>
+        <option value="fr">French</option>
+      </select>
+      <select id="filter-category">
+        <option value="">All categories</option>
+        <option value="food">Food quality</option>
+        <option value="cleanliness">Cleanliness</option>
+        <option value="service">Staff &amp; service</option>
+        <option value="price">Price</option>
+        <option value="other">Other</option>
+      </select>
+      <button class="btn" id="refresh-btn">Refresh</button>
+    </div>
+
+    <table class="data-table" id="fb-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Lang</th>
+          <th>Category</th>
+          <th>Message</th>
+          <th>Contact</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="fb-body"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state" style="display:none;">No feedback matches these filters yet.</div>
+  </main>
+
+<script>
+const body = document.getElementById('fb-body');
+const emptyState = document.getElementById('empty-state');
+const statTotal = document.getElementById('stat-total');
+const statNew = document.getElementById('stat-new');
+
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadFeedback() {
+  const status = document.getElementById('filter-status').value;
+  const language = document.getElementById('filter-language').value;
+  const category = document.getElementById('filter-category').value;
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  if (language) params.set('language', language);
+  if (category) params.set('category', category);
+
+  const res = await fetch('/api/feedback/admin?' + params.toString());
+  const rows = await res.json();
+
+  statTotal.textContent = rows.length;
+  statNew.textContent = rows.filter(r => r.status === 'new').length;
+
+  if (rows.length === 0) {
+    body.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(new Date(r.created_at.replace(' ', 'T') + 'Z').toLocaleString())}</td>
+      <td><span class="lang-tag">${esc(r.language)}</span></td>
+      <td>${esc(r.category || 'â')}</td>
+      <td class="fb-message">${esc(r.message)}</td>
+      <td>${esc(r.contact || 'â')}</td>
+      <td><span class="status-pill ${esc(r.status)}">${esc(r.status)}</span></td>
+      <td>
+        <button class="btn small toggle-btn" data-id="${r.id}" data-status="${r.status === 'new' ? 'reviewed' : 'new'}">
+          Mark ${r.status === 'new' ? 'reviewed' : 'new'}
+        </button>
+        <button class="btn small danger delete-btn" data-id="${r.id}">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+
+  body.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await fetch(`/api/feedback/admin/${btn.dataset.id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: btn.dataset.status })
+      });
+      loadFeedback();
+    });
+  });
+  body.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this feedback entry?')) return;
+      await fetch(`/api/feedback/admin/${btn.dataset.id}`, { method: 'DELETE' });
+      loadFeedback();
+    });
+  });
+}
+
+document.getElementById('refresh-btn').addEventListener('click', loadFeedback);
+document.getElementById('filter-status').addEventListener('change', loadFeedback);
+document.getElementById('filter-language').addEventListener('change', loadFeedback);
+document.getElementById('filter-category').addEventListener('change', loadFeedback);
+
+loadFeedback();
+</script>
+</body>
+</html>
